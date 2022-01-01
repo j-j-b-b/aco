@@ -8,5 +8,5 @@ flask >= 2.0
 
 ## 操作说明  
 
-运行<kbd>run.py</kbd>  
+运行<kbd>run.py</kbd>，浏览器访问 localhost:6379  
 
