@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+</head>
+<body>
+    <div class="wrapper" style="width: 100%;height: 100vh;background: white;overflow: hidden;">
+       <canvas id="canvas" style="width: 1200px;height: 800px;" ></canvas> 
+    </div>
+    <script src="./static/js/zepto.min.js"></script>
+
+    <script>
+    var dataList=[], newArr = [];
+    var canvas = document.getElementById("canvas"),
+        context = canvas.getContext("2d");
+            window.setTimeout(function () {
+            window.location.reload();
+        }, 500);
+    
+    function resizeCanvas() {
+  $('#canvas').attr("width", $(window).get(0).innerWidth);
+  $('#canvas').attr("height", $(window).get(0).innerHeight);
+};
+    resizeCanvas();
+
+    var source = new EventSource("{{ url_for('sse.stream') }}");
+    source.addEventListener('greeting', function(event) {
+        
+        var data = JSON.parse(event.data);
+        console.log(data);
+        console.log(data.status);
+        console.log(data.best_path);
+        console.log(data.shortest_distance);    
+        data.best_path = data.best_path.replace(/\'/g, '"')
+        dataList1 = data.best_path.split("?") ;
+
+        for(var j = 0; j < dataList1.length-1; j++){
+            var jsObject = JSON.parse(dataList1[j])
+            dataList[j] = jsObject
+        }
+        console.log(dataList)
+        console.log(dataList1)             
+        newArray = dataList1;
+        console.log(newArray)
+        for(var j = 0; j < newArray.length-1; j++){
+            var jsObject = JSON.parse(newArray[j])
+            newArr[j] = jsObject
+        }
+        newArr = dataList.sort((a, b) => { return b.sort - a.sort });
+        draw()
+        console.log(newArr)
+        console.log(dataList)
+    }, false);
+    
+
+function draw() {
+    context.beginPath()
+    context.moveTo(newArr[0].x, newArr[0].y)
+    for (var j = 0; j < newArr.length; j++) {
+        context.lineTo(newArr[j].x, newArr[j].y)
+    }
+    context.lineTo(dataList[0].x, dataList[0].y);
+    context.strokeStyle = 'balck';
+    context.stroke()//进行绘制
+    for (var k = 0; k < dataList.length; k++) {
+        drawDot(dataList[k], color16())
+    }
+}
+    function color16() { //十六进制颜色随机
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+        var color = '#' + r.toString(16) + g.toString(16) + b.toString(16);
+        return color;
+    }
+    function drawDot(pos, color) {
+        context.beginPath()
+        context.fillStyle = 'blue';
+        context.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+        context.closePath()
+        context.fill()
+    }
+      </script>
+    
+</body>
+</html>
